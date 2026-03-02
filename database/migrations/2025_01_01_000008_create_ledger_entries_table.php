@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('reference')->unique();
             $table->string('counterpart_reference')->nullable(); // Links debit to credit
             $table->json('meta')->nullable();
-            $table->timestamp('posted_at');
+            $table->timestamp('posted_at')->useCurrent();
             $table->timestamps();
 
             $table->index('user_id');

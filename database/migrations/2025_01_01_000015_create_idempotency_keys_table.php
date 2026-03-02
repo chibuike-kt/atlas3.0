@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('endpoint');
             $table->integer('response_status');
             $table->json('response_body');
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             $table->unique(['user_id', 'key']);

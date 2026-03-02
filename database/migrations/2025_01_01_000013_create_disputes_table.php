@@ -34,7 +34,7 @@ return new class extends Migration
             $table->bigInteger('refund_amount')->nullable();     // In kobo
             $table->text('resolution_note')->nullable();
             $table->uuid('resolved_by')->nullable();             // Admin user ID
-            $table->timestamp('opened_at');
+            $table->timestamp('opened_at')->useCurrent();
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamp('resolved_at')->nullable();
             $table->json('meta')->nullable();

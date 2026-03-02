@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('user_agent')->nullable();
             $table->boolean('is_revoked')->default(false);
             $table->timestamp('last_used_at')->nullable();
-            $table->timestamp('expires_at');
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             $table->unique('token_hash');

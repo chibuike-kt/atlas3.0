@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('currency', 5)->default('NGN');
             $table->enum('status', ['completed', 'failed', 'partial']);
             $table->json('steps_summary');                  // Snapshot of each step
-            $table->timestamp('issued_at');
+            $table->timestamp('issued_at')->useCurrent();
             $table->timestamps();
 
             $table->index('user_id');

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('currency', 5)->default('NGN');
             $table->string('description');
             $table->json('breakdown')->nullable();          // Fee calculation details
-            $table->timestamp('charged_at');
+            $table->timestamp('charged_at')->useCurrent();
             $table->timestamps();
 
             $table->index('user_id');

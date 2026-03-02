@@ -10,10 +10,10 @@
     "license": "proprietary",
     "require": {
         "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10",
-        "php-open-source-saver/jwt-auth": "^2.4",
-        "guzzlehttp/guzzle": "^7.9",
+        "php-open-source-saver/jwt-auth": "^2.8",
         "spatie/laravel-permission": "^6.10"
     },
     "require-dev": {
