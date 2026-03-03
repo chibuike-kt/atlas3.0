@@ -12,9 +12,7 @@ use Illuminate\Http\Request;
 
 class RuleController extends BaseApiController
 {
-    public function __construct(private readonly RuleService $ruleService)
-    {
-    }
+    public function __construct(private readonly RuleService $ruleService) {}
 
     /**
      * GET /api/rules
@@ -112,9 +110,8 @@ class RuleController extends BaseApiController
                 'preview'      => $result['parsed'],
                 'confidence'   => $result['confidence'],
                 'ambiguities'  => $result['ambiguities'],
-                'ready_to_save'=> $result['confidence'] >= 0.70 && empty($result['ambiguities']),
+                'ready_to_save' => $result['confidence'] >= 0.70 && empty($result['ambiguities']),
             ], 'Rule parsed successfully. Review the preview before saving.');
-
         } catch (\RuntimeException $e) {
             return $this->error($e->getMessage());
         } catch (\Throwable $e) {
@@ -235,7 +232,7 @@ class RuleController extends BaseApiController
             'failure_reason'  => $e->failure_reason,
             'started_at'      => $e->started_at,
             'completed_at'    => $e->completed_at,
-            'duration_seconds'=> $e->duration_seconds,
+            'duration_seconds' => $e->duration_seconds,
         ]), 'Execution history retrieved.');
     }
 

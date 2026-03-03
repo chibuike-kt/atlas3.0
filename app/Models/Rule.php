@@ -103,7 +103,7 @@ class Rule extends Model
 
   public function getSuccessRateAttribute(): float
   {
-    if ($this->execution_count === 0) {
+    if (empty($this->execution_count)) {
       return 0;
     }
 
