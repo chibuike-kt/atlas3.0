@@ -30,7 +30,7 @@ class AuthController extends BaseApiController
     } catch (ValidationException $e) {
       return $this->unprocessable($e->getMessage(), $e->errors());
     } catch (\Throwable $e) {
-      return $this->serverError($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+      return $this->serverError('Registration failed. Please try again.');
     }
   }
 

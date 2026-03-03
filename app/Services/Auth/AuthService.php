@@ -206,7 +206,7 @@ class AuthService
     $accessToken  = JWTAuth::fromUser($user);
     $refreshToken = Str::random(80);
 
-    $ttlMinutes = config('jwt.refresh_ttl', 20160); // 14 days default
+    $ttlMinutes = (int) config("jwt.refresh_ttl", 20160); // 14 days default
 
     RefreshToken::create([
       'user_id'            => $user->id,
@@ -222,7 +222,7 @@ class AuthService
       'access_token'  => $accessToken,
       'refresh_token' => $refreshToken,
       'token_type'    => 'Bearer',
-      'expires_in'    => config('jwt.ttl', 1440) * 60, // seconds
+      'expires_in'    => (int) config('jwt.ttl', 1440) * 60, // seconds
     ];
   }
 

@@ -61,3 +61,29 @@ Route::middleware('auth:api')->group(function () {
 Route::prefix('webhooks')->middleware('mono.webhook')->group(function () {
   Route::post('/mono', [WebhookController::class, 'mono']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Step 5 — Accounts & Transactions (added after Mono integration)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->group(function () {
+
+  // Accounts
+  Route::prefix('accounts')->group(function () {
+    Route::get('/',              [\App\Http\Controllers\Api\AccountController::class, 'index']);
+    Route::post('/link',         [\App\Http\Controllers\Api\AccountController::class, 'link']);
+    Route::get('/{id}',          [\App\Http\Controllers\Api\AccountController::class, 'show']);
+    Route::post('/{id}/sync',    [\App\Http\Controllers\Api\AccountController::class, 'sync']);
+    Route::post('/{id}/primary', [\App\Http\Controllers\Api\AccountController::class, 'setPrimary']);
+    Route::delete('/{id}',       [\App\Http\Controllers\Api\AccountController::class, 'unlink']);
+  });
+
+  // Transactions
+  Route::prefix('transactions')->group(function () {
+    Route::get('/',          [\App\Http\Controllers\Api\TransactionController::class, 'index']);
+    Route::get('/summary',   [\App\Http\Controllers\Api\TransactionController::class, 'summary']);
+    Route::get('/{id}',      [\App\Http\Controllers\Api\TransactionController::class, 'show']);
+  });
+});

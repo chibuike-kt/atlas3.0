@@ -1,0 +1,29 @@
+{
+    "success": true,
+    "message": "Account created successfully. Welcome to Atlas.",
+    "data": {
+        "user": {
+            "id": "019cb0fa-5396-719c-993a-61dafb5d8e6c",
+            "full_name": "Tunde Adeyemi",
+            "first_name": "Tunde",
+            "initials": "TA",
+            "email": "tunde@test.com",
+            "phone": "08012345678",
+            "avatar_url": null,
+            "kyc_status": null,
+            "is_active": null,
+            "notifications_enabled": null,
+            "timezone": "Africa/Lagos",
+            "currency": "NGN",
+            "email_verified_at": null,
+            "last_login_at": null,
+            "created_at": "2026-03-02T23:55:21.000000Z"
+        },
+        "tokens": {
+            "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2F1dGgvcmVnaXN0ZXIiLCJpYXQiOjE3NzI0OTU3MjEsImV4cCI6MTc3MjQ5OTMyMSwibmJmIjoxNzcyNDk1NzIxLCJqdGkiOiJ3RDdZMWliSGFneHAzZUk0Iiwic3ViIjoiMDE5Y2IwZmEtNTM5Ni03MTljLTk5M2EtNjFkYWZiNWQ4ZTZjIiwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyIsImVtYWlsIjoidHVuZGVAdGVzdC5jb20iLCJuYW1lIjoiVHVuZGUgQWRleWVtaSJ9.m2J-XNsNgdzFf8TJtFevxgGzbTE0CHTFchzSzZM_yoA",
+            "refresh_token": "jUxDJN7u7lu9VDY5lM9Rzjsl1o6iA91DB4mDQO9sWHVnKy1ZdkIXDXi9QrhOiqfTbLiK2H549rypcTMP",
+            "token_type": "Bearer",
+            "expires_in": 3600
+        }
+    }
+}
