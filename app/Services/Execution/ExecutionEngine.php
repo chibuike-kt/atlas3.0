@@ -201,9 +201,13 @@ class ExecutionEngine
 
     private function resolveStepAmount(array $action, int $remainingAmount, int $balance): int
     {
-        $amountType = \App\Enums\AmountType::from($action['amount_type']);
+        $amountTypeString = is_string($action['amount_type'])
+            ? $action['amount_type']
+            : $action['amount_type']->value;
 
-        return match($amountType) {
+        $amountType = \App\Enums\AmountType::from($amountTypeString);
+
+        return match ($amountType) {
             \App\Enums\AmountType::Fixed      => (int) $action['amount'],
             \App\Enums\AmountType::Percentage => (int) round($balance * ($action['amount'] / 10000)),
             \App\Enums\AmountType::Remainder  => $remainingAmount,

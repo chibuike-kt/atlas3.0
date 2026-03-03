@@ -1,11 +1,36 @@
-id: "019cb140-a4cc-700e-b1e2-764a7fb15e1e",
-
-
 
 { "email": "tunde@test.com", "password": "Password1" }
 
 
-019cb1c6-4de9-7182-8b50-fa7b1664e75e  'rule id'
-
 
 /api/executions/trigger/019cb1bc-fba5-72d7-ade1-0bac0bc4734d
+
+
+{
+  "full_name": "Tunde Adeyemi",
+  "email": "tunde@test.com",
+  "phone": "08012345678",
+  "password": "Password1",
+  "password_confirmation": "Password1",
+  "pin": "1234"
+}
+
+
+019cb5d5-b57e-70b1-b2bc-a7c1fbfddef6 'bank connected id'
+
+
+{
+  "name": "Monthly savings",
+  "connected_account_id": "019cb5d5-b57e-70b1-b2bc-a7c1fbfddef6",
+  "trigger_type": "schedule",
+  "trigger_config": { "frequency": "monthly", "day": 25, "time": "08:00" },
+  "total_amount_type": "percentage",
+  "total_amount": 2000,
+  "actions": [{
+    "action_type": "save_piggyvest",
+    "amount_type": "percentage",
+    "amount": 2000,
+    "label": "Save 20% to PiggyVest",
+    "step_order": 1
+  }]
+}

@@ -2,19 +2,14 @@
 
 namespace App\Models;
 
-use App\Enums\ActionType;
-use App\Enums\AmountType;
 use App\Enums\ExecutionStatus;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ExecutionStep extends Model
 {
-  use HasFactory, HasUuids;
-
   protected $fillable = [
+    'id',
     'execution_id',
     'user_id',
     'step_order',
@@ -24,15 +19,18 @@ class ExecutionStep extends Model
     'currency',
     'amount_type',
     'status',
+    'config',
     'rail_reference',
+    'result',
     'failure_reason',
     'rolled_back',
     'rollback_reference',
-    'config',
-    'result',
     'executed_at',
     'rolled_back_at',
   ];
+
+  public $incrementing = false;
+  protected $keyType   = 'string';
 
   protected function casts(): array
   {
@@ -40,10 +38,9 @@ class ExecutionStep extends Model
       'action_type'    => 'string',
       'amount_type'    => 'string',
       'status'         => ExecutionStatus::class,
-      'amount'         => 'integer',
-      'rolled_back'    => 'boolean',
       'config'         => 'array',
       'result'         => 'array',
+      'rolled_back'    => 'boolean',
       'executed_at'    => 'datetime',
       'rolled_back_at' => 'datetime',
     ];
@@ -96,7 +93,7 @@ class ExecutionStep extends Model
       ->where('rolled_back', false);
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────
+  // ── State helpers ─────────────────────────────────────────────────────
 
   public function markCompleted(string $reference, array $result = []): void
   {
@@ -120,10 +117,10 @@ class ExecutionStep extends Model
   public function markRolledBack(string $reference): void
   {
     $this->update([
-      'status'              => ExecutionStatus::RolledBack,
-      'rolled_back'         => true,
-      'rollback_reference'  => $reference,
-      'rolled_back_at'      => now(),
+      'status'             => ExecutionStatus::RolledBack,
+      'rolled_back'        => true,
+      'rollback_reference' => $reference,
+      'rolled_back_at'     => now(),
     ]);
   }
 }
