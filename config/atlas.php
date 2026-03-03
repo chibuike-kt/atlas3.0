@@ -126,10 +126,12 @@ return [
     'salary_confidence_threshold'  => 0.75,
     'projection_days_ahead'        => 30,
     'idle_cash_threshold_days'     => 7,
-    'idle_cash_min_amount_kobo'    => 500_000, // ₦5,000
-    'savings_rate_target'          => 0.20,
+    'idle_cash_minimum_amount'       => 1000000,  // ₦10,000 kobo
+    'savings_rate_target_percent'    => 20,
     'food_spend_target_ratio'      => 0.25,
-    'insight_refresh_hours'        => 24,
+    'insight_refresh_hours'          => 24,
+    'insight_max_per_day'            => 3,
+    'suggestion_cooldown_days'       => 14,
   ],
 
   /*

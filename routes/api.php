@@ -100,3 +100,37 @@ Route::middleware('auth:api')->prefix('financial-profile')->group(function () {
   Route::get('/projection',  [\App\Http\Controllers\Api\FinancialProfileController::class, 'projection']);
   Route::get('/idle-cash',   [\App\Http\Controllers\Api\FinancialProfileController::class, 'idleCash']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Step 7 — Advisory Insights
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->prefix('insights')->group(function () {
+  Route::get('/',              [\App\Http\Controllers\Api\InsightController::class, 'index']);
+  Route::get('/summary',       [\App\Http\Controllers\Api\InsightController::class, 'summary']);
+  Route::post('/refresh',      [\App\Http\Controllers\Api\InsightController::class, 'refresh']);
+  Route::post('/read-all',     [\App\Http\Controllers\Api\InsightController::class, 'markAllRead']);
+  Route::post('/{id}/read',    [\App\Http\Controllers\Api\InsightController::class, 'markRead']);
+  Route::post('/{id}/action',  [\App\Http\Controllers\Api\InsightController::class, 'action']);
+  Route::delete('/{id}',       [\App\Http\Controllers\Api\InsightController::class, 'dismiss']);
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Step 8 — Rules Engine
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->prefix('rules')->group(function () {
+  Route::get('/',                  [\App\Http\Controllers\Api\RuleController::class, 'index']);
+  Route::post('/',                 [\App\Http\Controllers\Api\RuleController::class, 'store']);
+  Route::post('/parse',            [\App\Http\Controllers\Api\RuleController::class, 'parse']);
+  Route::get('/{id}',              [\App\Http\Controllers\Api\RuleController::class, 'show']);
+  Route::put('/{id}',              [\App\Http\Controllers\Api\RuleController::class, 'update']);
+  Route::delete('/{id}',           [\App\Http\Controllers\Api\RuleController::class, 'destroy']);
+  Route::post('/{id}/pause',       [\App\Http\Controllers\Api\RuleController::class, 'pause']);
+  Route::post('/{id}/resume',      [\App\Http\Controllers\Api\RuleController::class, 'resume']);
+  Route::get('/{id}/executions',   [\App\Http\Controllers\Api\RuleController::class, 'executions']);
+});
