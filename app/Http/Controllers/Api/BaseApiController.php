@@ -7,5 +7,5 @@ use App\Http\Traits\ApiResponse;
 
 abstract class BaseApiController extends Controller
 {
-  use ApiResponse;
+    use ApiResponse;
 }
