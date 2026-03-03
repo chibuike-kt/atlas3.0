@@ -11,14 +11,10 @@ use Illuminate\Support\Str;
 
 class LedgerService
 {
-    /**
-     * Write debit and credit ledger entries for a completed execution.
-     */
     public function recordExecution(RuleExecution $execution): void
     {
         $runningBalance = $execution->balance_after ?? 0;
 
-        // Master debit entry — total amount debited from account
         LedgerEntry::create([
             'id'             => Str::uuid(),
             'user_id'        => $execution->user_id,
@@ -27,12 +23,11 @@ class LedgerService
             'description'    => 'Rule execution debit',
             'amount'         => $execution->total_debited,
             'currency'       => 'NGN',
-            'running_balance'=> $runningBalance,
+            'running_balance' => $runningBalance,
             'reference'      => LedgerEntry::generateReference(),
             'posted_at'      => now(),
         ]);
 
-        // Individual step credit entries
         foreach ($execution->steps()->completed()->get() as $step) {
             LedgerEntry::create([
                 'id'             => Str::uuid(),
@@ -40,19 +35,16 @@ class LedgerService
                 'execution_id'   => $execution->id,
                 'step_id'        => $step->id,
                 'entry_type'     => 'credit',
-                'description'    => $step->label ?? $step->action_type->value,
+                'description'    => $step->label ?? $step->action_type,
                 'amount'         => $step->amount,
                 'currency'       => 'NGN',
-                'running_balance'=> $runningBalance,
+                'running_balance' => $runningBalance,
                 'reference'      => LedgerEntry::generateReference(),
                 'posted_at'      => now(),
             ]);
         }
     }
 
-    /**
-     * Record the execution fee in the fee ledger.
-     */
     public function recordFee(RuleExecution $execution, int $fee): void
     {
         FeeLedger::create([
@@ -71,14 +63,11 @@ class LedgerService
         ]);
     }
 
-    /**
-     * Generate a receipt for a completed execution.
-     */
     public function generateReceipt(RuleExecution $execution, Rule $rule): Receipt
     {
         $stepsSummary = $execution->steps()->completed()->get()->map(fn($s) => [
             'step_order'  => $s->step_order,
-            'action_type' => $s->action_type->value,
+            'action_type' => $s->action_type,
             'label'       => $s->label,
             'amount'      => $s->amount,
             'formatted'   => '₦' . number_format($s->amount / 100, 2),
@@ -101,9 +90,6 @@ class LedgerService
         ]);
     }
 
-    /**
-     * Record a refund entry for a dispute resolution.
-     */
     public function recordRefund(RuleExecution $execution, int $refundAmount, string $reason): void
     {
         LedgerEntry::create([
@@ -114,12 +100,11 @@ class LedgerService
             'description'    => "Refund: {$reason}",
             'amount'         => $refundAmount,
             'currency'       => 'NGN',
-            'running_balance'=> $execution->connectedAccount->balance + $refundAmount,
+            'running_balance' => $execution->connectedAccount->balance + $refundAmount,
             'reference'      => LedgerEntry::generateReference(),
             'posted_at'      => now(),
         ]);
 
-        // Credit the user's account
         $execution->connectedAccount->creditBalance($refundAmount);
     }
 }

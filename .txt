@@ -3,7 +3,7 @@
 
 
 
-/api/executions/trigger/019cb1bc-fba5-72d7-ade1-0bac0bc4734d
+/api/executions/trigger/019cb5dc-9a38-7228-a218-473ec85e762a
 
 
 {
@@ -27,7 +27,7 @@
   "total_amount_type": "percentage",
   "total_amount": 2000,
   "actions": [{
-    "action_type": "save_piggyvest",
+    "action_type": "save_piggvest",
     "amount_type": "percentage",
     "amount": 2000,
     "label": "Save 20% to PiggyVest",
