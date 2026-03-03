@@ -87,3 +87,16 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/{id}',      [\App\Http\Controllers\Api\TransactionController::class, 'show']);
   });
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Step 6 — Financial Intelligence
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->prefix('financial-profile')->group(function () {
+  Route::get('/',            [\App\Http\Controllers\Api\FinancialProfileController::class, 'show']);
+  Route::post('/refresh',    [\App\Http\Controllers\Api\FinancialProfileController::class, 'refresh']);
+  Route::get('/projection',  [\App\Http\Controllers\Api\FinancialProfileController::class, 'projection']);
+  Route::get('/idle-cash',   [\App\Http\Controllers\Api\FinancialProfileController::class, 'idleCash']);
+});
