@@ -6,3 +6,6 @@ id: "019cb140-a4cc-700e-b1e2-764a7fb15e1e",
 
 
 019cb1c6-4de9-7182-8b50-fa7b1664e75e  'rule id'
+
+
+/api/executions/trigger/019cb1bc-fba5-72d7-ade1-0bac0bc4734d

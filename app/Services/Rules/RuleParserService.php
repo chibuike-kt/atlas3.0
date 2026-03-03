@@ -52,7 +52,7 @@ Return ONLY a valid JSON object with this exact structure — no explanation, no
   "actions": [
     {
       "step_order": 1,
-      "action_type": "send_bank | save_piggyvest | save_cowrywise | convert_crypto | pay_bill",
+      "action_type": "send_bank | save_piggvest | save_cowrywise | convert_crypto | pay_bill",
       "amount_type": "fixed | percentage | remainder",
       "amount": 0,
       "label": "Human-readable step description",
@@ -65,7 +65,7 @@ Return ONLY a valid JSON object with this exact structure — no explanation, no
 
 PARSING RULES:
 - Amounts in naira: convert to kobo (multiply by 100). "10k" = 1000000 kobo. "50%" = 5000 (basis points).
-- "Save" / "set aside" / "put away" → save_piggyvest (default savings rail)
+- "Save" / "set aside" / "put away" → save_piggvest (default savings rail)
 - "Invest" / "invest in" → save_cowrywise
 - "Send" / "transfer" / "pay [person]" → send_bank
 - "Convert" / "buy dollars" / "USDT" / "dollar" → convert_crypto
@@ -92,14 +92,14 @@ PROMPT;
                 'anthropic-version' => '2023-06-01',
                 'Content-Type'      => 'application/json',
             ])
-            ->timeout(config('atlas.anthropic.timeout', 30))
-            ->post($this->baseUrl . '/messages', [
-                'model'      => $this->model,
-                'max_tokens' => 1024,
-                'messages'   => [
-                    ['role' => 'user', 'content' => $prompt],
-                ],
-            ]);
+                ->timeout(config('atlas.anthropic.timeout', 30))
+                ->post($this->baseUrl . '/messages', [
+                    'model'      => $this->model,
+                    'max_tokens' => 1024,
+                    'messages'   => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                ]);
 
             if (! $response->successful()) {
                 throw new \RuntimeException('Claude API returned ' . $response->status());
@@ -115,7 +115,6 @@ PROMPT;
             $parsed['is_ai_parsed'] = true;
 
             return $parsed;
-
         } catch (\Throwable $e) {
             Log::error('Rule parsing failed', [
                 'rule_text' => $ruleText,

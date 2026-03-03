@@ -134,3 +134,26 @@ Route::middleware('auth:api')->prefix('rules')->group(function () {
   Route::post('/{id}/resume',      [\App\Http\Controllers\Api\RuleController::class, 'resume']);
   Route::get('/{id}/executions',   [\App\Http\Controllers\Api\RuleController::class, 'executions']);
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Step 10 — Executions & Receipts
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->group(function () {
+
+  // Executions
+  Route::prefix('executions')->group(function () {
+    Route::get('/',                  [\App\Http\Controllers\Api\ExecutionController::class, 'index']);
+    Route::get('/{id}',              [\App\Http\Controllers\Api\ExecutionController::class, 'show']);
+    Route::post('/trigger/{ruleId}', [\App\Http\Controllers\Api\ExecutionController::class, 'trigger']);
+    Route::get('/{id}/receipt',      [\App\Http\Controllers\Api\ExecutionController::class, 'receipt']);
+  });
+
+  // Receipts
+  Route::prefix('receipts')->group(function () {
+    Route::get('/',      [\App\Http\Controllers\Api\ExecutionController::class, 'receipts']);
+    Route::get('/{id}',  [\App\Http\Controllers\Api\ExecutionController::class, 'showReceipt']);
+  });
+});

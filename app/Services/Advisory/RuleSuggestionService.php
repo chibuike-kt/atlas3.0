@@ -83,7 +83,7 @@ class RuleSuggestionService
             'total_amount'          => $suggestedRate * 100, // basis points
             'actions'               => [
                 [
-                    'action_type' => 'save_piggyvest',
+                    'action_type' => 'save_piggvest',
                     'amount_type' => 'percentage',
                     'amount'      => $suggestedRate * 100,
                     'label'       => "Save {$suggestedRate}% to PiggyVest",
@@ -95,8 +95,8 @@ class RuleSuggestionService
         return $this->createSuggestion($user, [
             'title'          => "Save {$formatted} every salary day automatically",
             'body'           => "You are currently saving {$savingsRate}% of your income — below the recommended {$targetRate}%. " .
-                                "Atlas can move {$formatted} ({$suggestedRate}% of your salary) to PiggyVest automatically the moment it lands. " .
-                                "You will not feel it leaving.",
+                "Atlas can move {$formatted} ({$suggestedRate}% of your salary) to PiggyVest automatically the moment it lands. " .
+                "You will not feel it leaving.",
             'cta_label'      => 'Create this rule',
             'cta_action'     => 'create_rule',
             'action_payload' => $rulePayload,
@@ -153,7 +153,7 @@ class RuleSuggestionService
             'total_amount'         => null,
             'actions'              => [
                 [
-                    'action_type' => 'save_piggyvest',
+                    'action_type' => 'save_piggvest',
                     'amount_type' => 'remainder',
                     'amount'      => 0,
                     'label'       => 'Sweep idle cash to PiggyVest',
@@ -166,8 +166,8 @@ class RuleSuggestionService
         return $this->createSuggestion($user, [
             'title'          => "Sweep {$sweepFormatted} of idle cash every Sunday",
             'body'           => "You consistently have more than 1.5x your monthly expenses sitting in your current account. " .
-                                "Atlas can sweep the excess to PiggyVest every Sunday evening, keeping {$bufferFormatted} as your buffer. " .
-                                "Idle money should always be working.",
+                "Atlas can sweep the excess to PiggyVest every Sunday evening, keeping {$bufferFormatted} as your buffer. " .
+                "Idle money should always be working.",
             'cta_label'      => 'Create this rule',
             'cta_action'     => 'create_rule',
             'action_payload' => $rulePayload,
@@ -230,7 +230,7 @@ class RuleSuggestionService
         return $this->createSuggestion($user, [
             'title'          => 'Automate your recurring bills',
             'body'           => "Atlas found {$billFormatted} in bill payments over the last 60 days. " .
-                                "You can set these to run automatically each month so you never miss a payment or get disconnected.",
+                "You can set these to run automatically each month so you never miss a payment or get disconnected.",
             'cta_label'      => 'Create this rule',
             'cta_action'     => 'create_rule',
             'action_payload' => $rulePayload,
@@ -287,8 +287,8 @@ class RuleSuggestionService
         return $this->createSuggestion($user, [
             'title'          => "Hedge against inflation with {$formatted} in USDT",
             'body'           => "Your personal inflation rate is {$inflationRate}% this month — your naira is losing purchasing power. " .
-                                "Converting {$formatted} (10% of salary) to USDT on payday protects that portion from naira depreciation. " .
-                                "You can convert back any time.",
+                "Converting {$formatted} (10% of salary) to USDT on payday protects that portion from naira depreciation. " .
+                "You can convert back any time.",
             'cta_label'      => 'Create this rule',
             'cta_action'     => 'create_rule',
             'action_payload' => $rulePayload,
@@ -333,7 +333,7 @@ class RuleSuggestionService
             'total_amount'         => $ajoAmount,
             'actions'              => [
                 [
-                    'action_type' => 'save_piggyvest',
+                    'action_type' => 'save_piggvest',
                     'amount_type' => 'fixed',
                     'amount'      => $ajoAmount,
                     'label'       => "Ajo contribution — {$formatted}",
@@ -345,7 +345,7 @@ class RuleSuggestionService
         return $this->createSuggestion($user, [
             'title'          => "Never miss your ajo — automate {$formatted}/month",
             'body'           => "Atlas detected your monthly ajo/thrift contribution of {$formatted}. " .
-                                "Set it to run automatically on the 25th so you are never the member who delays the group.",
+                "Set it to run automatically on the 25th so you are never the member who delays the group.",
             'cta_label'      => 'Automate my ajo',
             'cta_action'     => 'create_rule',
             'action_payload' => $rulePayload,

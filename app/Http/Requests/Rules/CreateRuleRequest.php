@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\Rules;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,7 +40,7 @@ class CreateRuleRequest extends FormRequest
             'total_amount'      => ['nullable', 'integer'],
 
             'actions'               => ['required', 'array', 'min:1', 'max:15'],
-            'actions.*.action_type' => ['required', 'string', 'in:send_bank,save_piggyvest,save_cowrywise,convert_crypto,pay_bill'],
+            'actions.*.action_type' => ['required', 'string', 'in:send_bank,save_piggvest,save_cowrywise,convert_crypto,pay_bill'],
             'actions.*.amount_type' => ['required', 'string', 'in:fixed,percentage,remainder'],
             'actions.*.amount'      => ['required', 'numeric'],
             'actions.*.label'       => ['sometimes', 'nullable', 'string', 'max:80'],
@@ -57,7 +58,7 @@ class CreateRuleRequest extends FormRequest
             'trigger_type.required'          => 'A trigger type is required.',
             'trigger_type.in'                => 'Invalid trigger type. Valid: schedule, deposit, balance, manual.',
             'actions.required'               => 'At least one action is required.',
-            'actions.*.action_type.in'       => 'Invalid action type. Valid: send_bank, save_piggyvest, save_cowrywise, convert_crypto, pay_bill.',
+            'actions.*.action_type.in'       => 'Invalid action type. Valid: send_bank, save_piggvest, save_cowrywise, convert_crypto, pay_bill.',
             'actions.*.amount_type.in'       => 'Invalid amount type. Valid: fixed, percentage, remainder.',
             'actions.*.amount.required'      => 'Each action must have an amount.',
         ];

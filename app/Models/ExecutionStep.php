@@ -37,8 +37,8 @@ class ExecutionStep extends Model
   protected function casts(): array
   {
     return [
-      'action_type'    => ActionType::class,
-      'amount_type'    => AmountType::class,
+      'action_type'    => 'string',
+      'amount_type'    => 'string',
       'status'         => ExecutionStatus::class,
       'amount'         => 'integer',
       'rolled_back'    => 'boolean',
