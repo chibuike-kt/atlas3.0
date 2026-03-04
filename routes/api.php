@@ -156,4 +156,35 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/',      [\App\Http\Controllers\Api\ExecutionController::class, 'receipts']);
     Route::get('/{id}',  [\App\Http\Controllers\Api\ExecutionController::class, 'showReceipt']);
   });
+
+  Route::middleware('auth:api')->group(function () {
+
+    // Disputes
+    Route::prefix('disputes')->group(function () {
+      Route::get('/',                  [\App\Http\Controllers\Api\DisputeController::class, 'index']);
+      Route::post('/',                 [\App\Http\Controllers\Api\DisputeController::class, 'store']);
+      Route::get('/{id}',              [\App\Http\Controllers\Api\DisputeController::class, 'show']);
+      Route::post('/{id}/evidence',    [\App\Http\Controllers\Api\DisputeController::class, 'addEvidence']);
+      Route::post('/{id}/cancel',      [\App\Http\Controllers\Api\DisputeController::class, 'cancel']);
+    });
+
+    // Contacts
+    Route::prefix('contacts')->group(function () {
+      Route::get('/',                  [\App\Http\Controllers\Api\ContactController::class, 'index']);
+      Route::post('/',                 [\App\Http\Controllers\Api\ContactController::class, 'store']);
+      Route::post('/resolve',          [\App\Http\Controllers\Api\ContactController::class, 'resolve']);
+      Route::get('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'show']);
+      Route::put('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'update']);
+      Route::delete('/{id}',           [\App\Http\Controllers\Api\ContactController::class, 'destroy']);
+      Route::post('/{id}/favourite',   [\App\Http\Controllers\Api\ContactController::class, 'toggleFavourite']);
+    });
+
+    // Wallet
+    Route::prefix('wallet')->group(function () {
+      Route::get('/',                  [\App\Http\Controllers\Api\WalletController::class, 'index']);
+      Route::get('/rates',             [\App\Http\Controllers\Api\WalletController::class, 'rates']);
+      Route::get('/{network}',         [\App\Http\Controllers\Api\WalletController::class, 'show']);
+      Route::post('/{network}/withdraw', [\App\Http\Controllers\Api\WalletController::class, 'withdraw']);
+    });
+  });
 });

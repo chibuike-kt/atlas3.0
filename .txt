@@ -1,5 +1,7 @@
 
-{ "email": "tunde@test.com", "password": "Password1" }
+{ "email": "tunde@test.com", "password": "Password1" } 'login'
+
+{ "name": "John Doe", "account_number": "0123456789", "bank_code": "058", "bank_name": "GTBank" }   'add contacts'
 
 
 

@@ -168,6 +168,21 @@ class RuleExecution extends Model
     ]);
   }
 
+  public function isCompleted(): bool
+  {
+    return $this->status === ExecutionStatus::Completed;
+  }
+
+  public function isFailed(): bool
+  {
+    return $this->status === ExecutionStatus::Failed;
+  }
+
+  public function isPending(): bool
+  {
+    return $this->status === ExecutionStatus::Pending;
+  }
+
   public function markFailed(string $reason): void
   {
     $this->update([
