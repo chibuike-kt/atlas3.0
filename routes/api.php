@@ -186,5 +186,17 @@ Route::middleware('auth:api')->group(function () {
       Route::get('/{network}',         [\App\Http\Controllers\Api\WalletController::class, 'show']);
       Route::post('/{network}/withdraw', [\App\Http\Controllers\Api\WalletController::class, 'withdraw']);
     });
+
+    /*
+|--------------------------------------------------------------------------
+| Step 12 — NLP Chat Interface
+|--------------------------------------------------------------------------
+*/
+    Route::middleware('auth:api')->prefix('chat')->group(function () {
+      Route::post('/',          [\App\Http\Controllers\Api\ChatController::class, 'message']);
+      Route::get('/history',    [\App\Http\Controllers\Api\ChatController::class, 'history']);
+      Route::delete('/history', [\App\Http\Controllers\Api\ChatController::class, 'clearHistory']);
+      Route::get('/starters',   [\App\Http\Controllers\Api\ChatController::class, 'starters']);
+    });
   });
 });
