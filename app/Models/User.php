@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\TransactionType;
+use App\Models\SalaryAdvance;
+use App\Models\AtlasWallet;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -205,5 +207,15 @@ class User extends Authenticatable implements JWTSubject
     public function getOrCreateFinancialProfile(): FinancialProfile
     {
         return $this->financialProfile ?? FinancialProfile::create(['user_id' => $this->id]);
+    }
+
+    public function salaryAdvances(): HasMany
+    {
+        return $this->hasMany(SalaryAdvance::class);
+    }
+
+    public function wallets(): HasMany
+    {
+        return $this->hasMany(AtlasWallet::class);
     }
 }

@@ -198,5 +198,16 @@ Route::middleware('auth:api')->group(function () {
       Route::delete('/history', [\App\Http\Controllers\Api\ChatController::class, 'clearHistory']);
       Route::get('/starters',   [\App\Http\Controllers\Api\ChatController::class, 'starters']);
     });
+
+    /*--------------------------------------------------------------------------
+| Step 13 — Salary Advance
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->prefix('advance')->group(function () {
+    Route::get('/eligibility', [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'eligibility']);
+    Route::post('/request',    [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'request']);
+    Route::get('/',            [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'index']);
+    Route::get('/{id}',        [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'show']);
+});
   });
 });
