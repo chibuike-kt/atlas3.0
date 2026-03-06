@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'idempotent'   => IdempotencyMiddleware::class,
             'velocity'     => VelocityMiddleware::class,
             'mono.webhook' => VerifyMonoWebhook::class,
+            'admin'        => \App\Http\Middleware\AdminMiddleware::class,
         ]);
 
         $middleware->trustProxies(at: '*');

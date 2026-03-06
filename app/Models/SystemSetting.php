@@ -55,6 +55,16 @@ class SystemSetting extends Model
     Cache::forget("system_setting:{$key}");
   }
 
+  public function typedValue(): mixed
+  {
+    return match ($this->type) {
+      'integer' => (int) $this->value,
+      'float'   => (float) $this->value,
+      'boolean' => filter_var($this->value, FILTER_VALIDATE_BOOLEAN),
+      default   => $this->value,
+    };
+  }
+
   public static function getPublicSettings(): array
   {
     return Cache::remember('system_settings:public', self::CACHE_TTL, function () {

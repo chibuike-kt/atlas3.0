@@ -38,6 +38,9 @@ class User extends Authenticatable implements JWTSubject
         'last_login_ip',
         'failed_login_attempts',
         'locked_until',
+        'is_admin',
+        'suspended_at',
+        'suspension_reason',
     ];
 
     protected $hidden = [
@@ -58,6 +61,8 @@ class User extends Authenticatable implements JWTSubject
             'kyc_data'                 => 'array',
             'notification_preferences' => 'array',
             'failed_login_attempts'    => 'integer',
+            'is_admin'     => 'boolean',
+            'suspended_at' => 'datetime',
         ];
     }
 

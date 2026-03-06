@@ -209,5 +209,52 @@ Route::middleware('auth:api')->prefix('advance')->group(function () {
     Route::get('/',            [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'index']);
     Route::get('/{id}',        [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'show']);
 });
+
+    /*
+|--------------------------------------------------------------------------
+| Step 14 — Bill Payments
+|--------------------------------------------------------------------------
+*/
+    Route::middleware('auth:api')->prefix('bills')->group(function () {
+      Route::get('/providers',           [\App\Http\Controllers\Api\BillPaymentController::class, 'providers']);
+      Route::get('/variations/{serviceId}', [\App\Http\Controllers\Api\BillPaymentController::class, 'variations']);
+      Route::post('/verify',             [\App\Http\Controllers\Api\BillPaymentController::class, 'verify']);
+      Route::post('/pay',                [\App\Http\Controllers\Api\BillPaymentController::class, 'pay']);
+      Route::get('/history',             [\App\Http\Controllers\Api\BillPaymentController::class, 'history']);
+      Route::get('/history/{id}',        [\App\Http\Controllers\Api\BillPaymentController::class, 'show']);
+    });
+
+    /*
+|--------------------------------------------------------------------------
+| Step 15 — Admin Panel
+|--------------------------------------------------------------------------
+*/
+    Route::middleware(['auth:api', 'admin'])->prefix('admin')->group(function () {
+
+      // Dashboard
+      Route::get('/dashboard',                    [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index']);
+      Route::get('/dashboard/executions',         [\App\Http\Controllers\Admin\AdminDashboardController::class, 'recentExecutions']);
+      Route::get('/dashboard/advances',           [\App\Http\Controllers\Admin\AdminDashboardController::class, 'advances']);
+
+      // Users
+      Route::get('/users',                        [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
+      Route::get('/users/{id}',                   [\App\Http\Controllers\Admin\AdminUserController::class, 'show']);
+      Route::post('/users/{id}/suspend',          [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
+      Route::post('/users/{id}/unsuspend',        [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
+      Route::post('/users/{id}/make-admin',       [\App\Http\Controllers\Admin\AdminUserController::class, 'makeAdmin']);
+      Route::delete('/users/{id}/make-admin',     [\App\Http\Controllers\Admin\AdminUserController::class, 'revokeAdmin']);
+
+      // Disputes
+      Route::get('/disputes',                     [\App\Http\Controllers\Admin\AdminDisputeController::class, 'index']);
+      Route::get('/disputes/{id}',                [\App\Http\Controllers\Admin\AdminDisputeController::class, 'show']);
+      Route::post('/disputes/{id}/review',        [\App\Http\Controllers\Admin\AdminDisputeController::class, 'review']);
+      Route::post('/disputes/{id}/resolve',       [\App\Http\Controllers\Admin\AdminDisputeController::class, 'resolve']);
+
+      // System Settings
+      Route::get('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'index']);
+      Route::get('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'show']);
+      Route::put('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'update']);
+      Route::put('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'bulkUpdate']);
+    });
   });
 });
