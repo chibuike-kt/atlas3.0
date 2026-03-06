@@ -148,6 +148,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(FeeLedger::class);
     }
 
+    public function billPayments(): HasMany
+    {
+        return $this->hasMany(BillPayment::class);
+    }
+
     // ── Accessors ─────────────────────────────────────────────────────────
 
     public function getFirstNameAttribute(): string
