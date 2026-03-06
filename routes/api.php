@@ -256,5 +256,15 @@ Route::middleware('auth:api')->prefix('advance')->group(function () {
       Route::put('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'update']);
       Route::put('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'bulkUpdate']);
     });
+
+    /*
+|--------------------------------------------------------------------------
+| Step 16 — Push Notifications
+|--------------------------------------------------------------------------
+*/
+    Route::middleware('auth:api')->prefix('notifications')->group(function () {
+      Route::post('/token',    [\App\Http\Controllers\Api\NotificationController::class, 'registerToken']);
+      Route::delete('/token',  [\App\Http\Controllers\Api\NotificationController::class, 'removeToken']);
+    });
   });
 });

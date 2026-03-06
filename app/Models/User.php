@@ -41,6 +41,7 @@ class User extends Authenticatable implements JWTSubject
         'is_admin',
         'suspended_at',
         'suspension_reason',
+        'fcm_tokens',
     ];
 
     protected $hidden = [
@@ -63,6 +64,7 @@ class User extends Authenticatable implements JWTSubject
             'failed_login_attempts'    => 'integer',
             'is_admin'     => 'boolean',
             'suspended_at' => 'datetime',
+            'fcm_tokens'   => 'array',
         ];
     }
 
