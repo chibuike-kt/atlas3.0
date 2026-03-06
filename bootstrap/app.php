@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Middleware\ForceJsonResponse;
+use App\Http\Middleware\ForceJsonMiddleware;
+use App\Http\Middleware\SecurityHeadersMiddleware;
+use App\Http\Middleware\SanitizeInputMiddleware;
 use App\Http\Middleware\IdempotencyMiddleware;
 use App\Http\Middleware\VelocityMiddleware;
 use App\Http\Middleware\VerifyMonoWebhook;
@@ -8,6 +10,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -20,7 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
 
         $middleware->api(prepend: [
-            ForceJsonResponse::class,
+            ForceJsonMiddleware::class,
+            SecurityHeadersMiddleware::class,
+            SanitizeInputMiddleware::class,
         ]);
 
         $middleware->alias([
@@ -40,6 +45,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'You are not authenticated. Please log in.',
                 'data'    => null,
             ], 401);
+        });
+
+        $exceptions->render(function (ThrottleRequestsException $e, $request) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many requests. Please slow down.',
+                'data'    => [
+                    'retry_after' => $e->getHeaders()['Retry-After'] ?? null,
+                ],
+            ], 429);
         });
 
         $exceptions->render(function (ValidationException $e, $request) {

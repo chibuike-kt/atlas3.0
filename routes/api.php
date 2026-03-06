@@ -14,16 +14,37 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/health', function () {
+  $dbOk    = true;
+  $cacheOk = true;
+
+  try {
+    \Illuminate\Support\Facades\DB::connection()->getPdo();
+  } catch (\Throwable) {
+    $dbOk = false;
+  }
+
+  try {
+    \Illuminate\Support\Facades\Cache::put('health_check', true, 5);
+    $cacheOk = \Illuminate\Support\Facades\Cache::get('health_check') === true;
+  } catch (\Throwable) {
+    $cacheOk = false;
+  }
+
+  $status = ($dbOk && $cacheOk) ? 'healthy' : 'degraded';
+
   return response()->json([
     'success' => true,
-    'message' => 'Atlas API is running.',
+    'message' => 'Atlas API is ' . $status . '.',
     'data'    => [
+      'status'    => $status,
       'version'   => config('atlas.version'),
-      'tagline'   => config('atlas.tagline'),
       'timestamp' => now()->toISOString(),
-      'timezone'  => config('app.timezone'),
+      'services'  => [
+        'database' => $dbOk    ? 'ok' : 'error',
+        'cache'    => $cacheOk ? 'ok' : 'error',
+      ],
     ],
-  ]);
+  ], $status === 'healthy' ? 200 : 503);
 });
 
 Route::get('/settings/public', function () {
@@ -34,7 +55,7 @@ Route::get('/settings/public', function () {
   ]);
 });
 
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('throttle:auth')->group(function () {
   Route::post('/register', [AuthController::class, 'register']);
   Route::post('/login',    [AuthController::class, 'login']);
   Route::post('/refresh',  [AuthController::class, 'refresh']);
@@ -144,7 +165,7 @@ Route::middleware('auth:api')->prefix('rules')->group(function () {
 Route::middleware('auth:api')->group(function () {
 
   // Executions
-  Route::prefix('executions')->group(function () {
+  Route::prefix('executions')->middleware('throttle:execution')->group(function () {
     Route::get('/',                  [\App\Http\Controllers\Api\ExecutionController::class, 'index']);
     Route::get('/{id}',              [\App\Http\Controllers\Api\ExecutionController::class, 'show']);
     Route::post('/trigger/{ruleId}', [\App\Http\Controllers\Api\ExecutionController::class, 'trigger']);
@@ -156,115 +177,150 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/',      [\App\Http\Controllers\Api\ExecutionController::class, 'receipts']);
     Route::get('/{id}',  [\App\Http\Controllers\Api\ExecutionController::class, 'showReceipt']);
   });
+});
 
-  Route::middleware('auth:api')->group(function () {
 
-    // Disputes
-    Route::prefix('disputes')->group(function () {
-      Route::get('/',                  [\App\Http\Controllers\Api\DisputeController::class, 'index']);
-      Route::post('/',                 [\App\Http\Controllers\Api\DisputeController::class, 'store']);
-      Route::get('/{id}',              [\App\Http\Controllers\Api\DisputeController::class, 'show']);
-      Route::post('/{id}/evidence',    [\App\Http\Controllers\Api\DisputeController::class, 'addEvidence']);
-      Route::post('/{id}/cancel',      [\App\Http\Controllers\Api\DisputeController::class, 'cancel']);
-    });
+/*
+|--------------------------------------------------------------------------
+| Step 11 — Disputes, Contacts, Wallet
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:api')->group(function () {
 
-    // Contacts
-    Route::prefix('contacts')->group(function () {
-      Route::get('/',                  [\App\Http\Controllers\Api\ContactController::class, 'index']);
-      Route::post('/',                 [\App\Http\Controllers\Api\ContactController::class, 'store']);
-      Route::post('/resolve',          [\App\Http\Controllers\Api\ContactController::class, 'resolve']);
-      Route::get('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'show']);
-      Route::put('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'update']);
-      Route::delete('/{id}',           [\App\Http\Controllers\Api\ContactController::class, 'destroy']);
-      Route::post('/{id}/favourite',   [\App\Http\Controllers\Api\ContactController::class, 'toggleFavourite']);
-    });
+  // Disputes
+  Route::prefix('disputes')->group(function () {
+    Route::get('/',                  [\App\Http\Controllers\Api\DisputeController::class, 'index']);
+    Route::post('/',                 [\App\Http\Controllers\Api\DisputeController::class, 'store']);
+    Route::get('/{id}',              [\App\Http\Controllers\Api\DisputeController::class, 'show']);
+    Route::post('/{id}/evidence',    [\App\Http\Controllers\Api\DisputeController::class, 'addEvidence']);
+    Route::post('/{id}/cancel',      [\App\Http\Controllers\Api\DisputeController::class, 'cancel']);
+  });
 
-    // Wallet
-    Route::prefix('wallet')->group(function () {
-      Route::get('/',                  [\App\Http\Controllers\Api\WalletController::class, 'index']);
-      Route::get('/rates',             [\App\Http\Controllers\Api\WalletController::class, 'rates']);
-      Route::get('/{network}',         [\App\Http\Controllers\Api\WalletController::class, 'show']);
-      Route::post('/{network}/withdraw', [\App\Http\Controllers\Api\WalletController::class, 'withdraw']);
-    });
+  // Contacts
+  Route::prefix('contacts')->group(function () {
+    Route::get('/',                  [\App\Http\Controllers\Api\ContactController::class, 'index']);
+    Route::post('/',                 [\App\Http\Controllers\Api\ContactController::class, 'store']);
+    Route::post('/resolve',          [\App\Http\Controllers\Api\ContactController::class, 'resolve']);
+    Route::get('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'show']);
+    Route::put('/{id}',              [\App\Http\Controllers\Api\ContactController::class, 'update']);
+    Route::delete('/{id}',           [\App\Http\Controllers\Api\ContactController::class, 'destroy']);
+    Route::post('/{id}/favourite',   [\App\Http\Controllers\Api\ContactController::class, 'toggleFavourite']);
+  });
 
-    /*
+  // Wallet
+  Route::prefix('wallet')->group(function () {
+    Route::get('/',                  [\App\Http\Controllers\Api\WalletController::class, 'index']);
+    Route::get('/rates',             [\App\Http\Controllers\Api\WalletController::class, 'rates']);
+    Route::get('/{network}',         [\App\Http\Controllers\Api\WalletController::class, 'show']);
+    Route::post('/{network}/withdraw', [\App\Http\Controllers\Api\WalletController::class, 'withdraw']);
+  });
+});
+
+
+/*
 |--------------------------------------------------------------------------
 | Step 12 — NLP Chat Interface
 |--------------------------------------------------------------------------
 */
-    Route::middleware('auth:api')->prefix('chat')->group(function () {
-      Route::post('/',          [\App\Http\Controllers\Api\ChatController::class, 'message']);
-      Route::get('/history',    [\App\Http\Controllers\Api\ChatController::class, 'history']);
-      Route::delete('/history', [\App\Http\Controllers\Api\ChatController::class, 'clearHistory']);
-      Route::get('/starters',   [\App\Http\Controllers\Api\ChatController::class, 'starters']);
-    });
+Route::middleware(['auth:api', 'throttle:chat'])->prefix('chat')->group(function () {
+  Route::post('/',          [\App\Http\Controllers\Api\ChatController::class, 'message']);
+  Route::get('/history',    [\App\Http\Controllers\Api\ChatController::class, 'history']);
+  Route::delete('/history', [\App\Http\Controllers\Api\ChatController::class, 'clearHistory']);
+  Route::get('/starters',   [\App\Http\Controllers\Api\ChatController::class, 'starters']);
+});
 
-    /*--------------------------------------------------------------------------
+
+/*
+|--------------------------------------------------------------------------
 | Step 13 — Salary Advance
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:api')->prefix('advance')->group(function () {
-    Route::get('/eligibility', [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'eligibility']);
-    Route::post('/request',    [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'request']);
-    Route::get('/',            [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'index']);
-    Route::get('/{id}',        [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'show']);
+Route::middleware(['auth:api', 'throttle:advance'])->prefix('advance')->group(function () {
+  Route::get('/eligibility', [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'eligibility']);
+  Route::post('/request',    [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'request']);
+  Route::get('/',            [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'index']);
+  Route::get('/{id}',        [\App\Http\Controllers\Api\SalaryAdvanceController::class, 'show']);
 });
 
-    /*
+
+/*
 |--------------------------------------------------------------------------
 | Step 14 — Bill Payments
 |--------------------------------------------------------------------------
 */
-    Route::middleware('auth:api')->prefix('bills')->group(function () {
-      Route::get('/providers',           [\App\Http\Controllers\Api\BillPaymentController::class, 'providers']);
-      Route::get('/variations/{serviceId}', [\App\Http\Controllers\Api\BillPaymentController::class, 'variations']);
-      Route::post('/verify',             [\App\Http\Controllers\Api\BillPaymentController::class, 'verify']);
-      Route::post('/pay',                [\App\Http\Controllers\Api\BillPaymentController::class, 'pay']);
-      Route::get('/history',             [\App\Http\Controllers\Api\BillPaymentController::class, 'history']);
-      Route::get('/history/{id}',        [\App\Http\Controllers\Api\BillPaymentController::class, 'show']);
-    });
+Route::middleware(['auth:api', 'throttle:bills'])->prefix('bills')->group(function () {
+  Route::get('/providers',           [\App\Http\Controllers\Api\BillPaymentController::class, 'providers']);
+  Route::get('/variations/{serviceId}', [\App\Http\Controllers\Api\BillPaymentController::class, 'variations']);
+  Route::post('/verify',             [\App\Http\Controllers\Api\BillPaymentController::class, 'verify']);
+  Route::post('/pay',                [\App\Http\Controllers\Api\BillPaymentController::class, 'pay']);
+  Route::get('/history',             [\App\Http\Controllers\Api\BillPaymentController::class, 'history']);
+  Route::get('/history/{id}',        [\App\Http\Controllers\Api\BillPaymentController::class, 'show']);
+});
 
-    /*
+
+/*
 |--------------------------------------------------------------------------
 | Step 15 — Admin Panel
 |--------------------------------------------------------------------------
 */
-    Route::middleware(['auth:api', 'admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:api', 'admin'])->prefix('admin')->group(function () {
 
-      // Dashboard
-      Route::get('/dashboard',                    [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index']);
-      Route::get('/dashboard/executions',         [\App\Http\Controllers\Admin\AdminDashboardController::class, 'recentExecutions']);
-      Route::get('/dashboard/advances',           [\App\Http\Controllers\Admin\AdminDashboardController::class, 'advances']);
+  // Dashboard
+  Route::get('/dashboard',                    [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index']);
+  Route::get('/dashboard/executions',         [\App\Http\Controllers\Admin\AdminDashboardController::class, 'recentExecutions']);
+  Route::get('/dashboard/advances',           [\App\Http\Controllers\Admin\AdminDashboardController::class, 'advances']);
 
-      // Users
-      Route::get('/users',                        [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
-      Route::get('/users/{id}',                   [\App\Http\Controllers\Admin\AdminUserController::class, 'show']);
-      Route::post('/users/{id}/suspend',          [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
-      Route::post('/users/{id}/unsuspend',        [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
-      Route::post('/users/{id}/make-admin',       [\App\Http\Controllers\Admin\AdminUserController::class, 'makeAdmin']);
-      Route::delete('/users/{id}/make-admin',     [\App\Http\Controllers\Admin\AdminUserController::class, 'revokeAdmin']);
+  // Users
+  Route::get('/users',                        [\App\Http\Controllers\Admin\AdminUserController::class, 'index']);
+  Route::get('/users/{id}',                   [\App\Http\Controllers\Admin\AdminUserController::class, 'show']);
+  Route::post('/users/{id}/suspend',          [\App\Http\Controllers\Admin\AdminUserController::class, 'suspend']);
+  Route::post('/users/{id}/unsuspend',        [\App\Http\Controllers\Admin\AdminUserController::class, 'unsuspend']);
+  Route::post('/users/{id}/make-admin',       [\App\Http\Controllers\Admin\AdminUserController::class, 'makeAdmin']);
+  Route::delete('/users/{id}/make-admin',     [\App\Http\Controllers\Admin\AdminUserController::class, 'revokeAdmin']);
 
-      // Disputes
-      Route::get('/disputes',                     [\App\Http\Controllers\Admin\AdminDisputeController::class, 'index']);
-      Route::get('/disputes/{id}',                [\App\Http\Controllers\Admin\AdminDisputeController::class, 'show']);
-      Route::post('/disputes/{id}/review',        [\App\Http\Controllers\Admin\AdminDisputeController::class, 'review']);
-      Route::post('/disputes/{id}/resolve',       [\App\Http\Controllers\Admin\AdminDisputeController::class, 'resolve']);
+  // Disputes
+  Route::get('/disputes',                     [\App\Http\Controllers\Admin\AdminDisputeController::class, 'index']);
+  Route::get('/disputes/{id}',                [\App\Http\Controllers\Admin\AdminDisputeController::class, 'show']);
+  Route::post('/disputes/{id}/review',        [\App\Http\Controllers\Admin\AdminDisputeController::class, 'review']);
+  Route::post('/disputes/{id}/resolve',       [\App\Http\Controllers\Admin\AdminDisputeController::class, 'resolve']);
 
-      // System Settings
-      Route::get('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'index']);
-      Route::get('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'show']);
-      Route::put('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'update']);
-      Route::put('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'bulkUpdate']);
-    });
+  // System Settings
+  Route::get('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'index']);
+  Route::get('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'show']);
+  Route::put('/settings/{key}',               [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'update']);
+  Route::put('/settings',                     [\App\Http\Controllers\Admin\AdminSystemSettingController::class, 'bulkUpdate']);
+});
 
-    /*
+
+/*
 |--------------------------------------------------------------------------
 | Step 16 — Push Notifications
 |--------------------------------------------------------------------------
 */
-    Route::middleware('auth:api')->prefix('notifications')->group(function () {
-      Route::post('/token',    [\App\Http\Controllers\Api\NotificationController::class, 'registerToken']);
-      Route::delete('/token',  [\App\Http\Controllers\Api\NotificationController::class, 'removeToken']);
-    });
+Route::middleware('auth:api')->prefix('notifications')->group(function () {
+  Route::post('/token',        function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+      'token'    => ['required', 'string'],
+      'platform' => ['sometimes', 'in:android,ios,web'],
+    ]);
+
+    app(\App\Services\Notifications\FcmService::class)->registerToken(
+      $request->user(),
+      $validated['token'],
+      $validated['platform'] ?? 'android'
+    );
+
+    return response()->json(['success' => true, 'message' => 'Token registered.']);
+  });
+
+  Route::delete('/token',      function (\Illuminate\Http\Request $request) {
+    $validated = $request->validate(['token' => ['required', 'string']]);
+
+    app(\App\Services\Notifications\FcmService::class)->removeToken(
+      $request->user(),
+      $validated['token']
+    );
+
+    return response()->json(['success' => true, 'message' => 'Token removed.']);
   });
 });
