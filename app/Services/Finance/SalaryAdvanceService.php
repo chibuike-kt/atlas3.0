@@ -7,6 +7,8 @@ use App\Models\LedgerEntry;
 use App\Models\SalaryAdvance;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Events\AdvanceDisbursed;
+use App\Events\AdvanceRepaid;
 use App\Services\Execution\FeeCalculatorService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -188,6 +190,8 @@ class SalaryAdvanceService
         'status'       => 'disbursed',
         'disbursed_at' => now(),
       ]);
+
+      AdvanceDisbursed::dispatch($advance->fresh());
     });
 
     Log::info('Salary advance disbursed', [
@@ -246,6 +250,8 @@ class SalaryAdvanceService
         'repaid_at'   => now(),
         'repaid_amount' => $advance->repayment_amount,
       ]);
+
+      AdvanceRepaid::dispatch($advance->fresh());
     });
 
     Log::info('Salary advance repaid automatically', [
